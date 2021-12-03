@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from src.conf import TARGET_TABLE, SAVED_TABLE
+from src.conf import TARGET_TABLE, SAVED_TABLE_SQL
 
 import pyspark.sql.functions as f
 
@@ -13,6 +13,16 @@ spark = SparkSession.builder\
 # connection url
 url = "jdbc:postgresql://postgresql:5432/postgres"
 
+# query
+sql_query = """
+(
+    SELECT age,
+           count(*) rows_amount
+FROM {}
+GROUP BY 1
+) t
+""".format(TARGET_TABLE)
+
 # load query
 df = spark.read\
     .option("driver", "org.postgresql.Driver")\
@@ -20,24 +30,9 @@ df = spark.read\
     .option("url", url)\
     .option("user", "p_user")\
     .option("password", "password123")\
-    .option("dbtable", TARGET_TABLE)\
+    .option("dbtable", sql_query)\
     .option("fetchsize", 10000)\
     .load()
 
-# group df
-df_grouped = df\
-.groupBy("age")\
-.agg(
-    f.count("*").alias("rows_amount")
-    )
-
-# df_grouped explain
-print("DF_GROUPED_EXPLAIN!!!")
-df_grouped.explain()
-
 # save to csv
-df_grouped.repartition(1).write.mode("overwrite").format("com.databricks.spark.csv").save(SAVED_TABLE)
-#df_grouped.write.csv(SAVED_TABLE)
-
-
-
+df.repartition(1).write.mode("overwrite").format("com.databricks.spark.csv").save(SAVED_TABLE_SQL)

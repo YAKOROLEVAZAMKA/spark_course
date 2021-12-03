@@ -22,5 +22,4 @@ RUN wget "https://jdbc.postgresql.org/download/postgresql-42.3.1.jar"
 RUN mv postgresql-42.3.1.jar jars/
 
 
-CMD ["spark_task_homework/src/task.py"]
 ENTRYPOINT ["python3"]

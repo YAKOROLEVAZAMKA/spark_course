@@ -60,7 +60,7 @@ services:
       postgresql:
         condition: service_healthy
 
-  spark_task_homework:
+  spark_task_homework_spark:
     build: spark_task_homework
     environment:
       - PYTHONPATH=${PYTHONPATH}:/app/spark_task_homework
@@ -69,12 +69,29 @@ services:
     volumes:
       - ./data:/app/data
       - ./spark_task_homework:/app/spark_task_homework
+    command: [ "spark_task_homework/src/task.py" ]
     links:
       - postgresql:postgresql
-
     depends_on:
       spark_task_2:
         condition: service_completed_successfully
+
+  spark_task_homework_sql:
+    build: spark_task_homework
+    environment:
+      - PYTHONPATH=${PYTHONPATH}:/app/spark_task_homework
+      - SAVED_TABLE=data/age_sql.csv
+      - TARGET_TABLE=public.bank
+    volumes:
+      - ./data:/app/data
+      - ./spark_task_homework:/app/spark_task_homework
+    command: [ "spark_task_homework/src/task_sql.py" ]
+    links:
+      - postgresql:postgresql
+    depends_on:
+      spark_task_2:
+        condition: service_completed_successfully
+
 
   zeppelin:
     build: zeppelin
