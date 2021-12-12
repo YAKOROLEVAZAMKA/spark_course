@@ -1,20 +1,33 @@
-# Скачать данные в папку data
+# Сборка протестирована на Ubuntu 18.04 LTS
 ```
-sudo docker-compose build download_habr_data
-sudo docker-compose up download_habr_data
+Для запуска может потребоваться:
+
+1) sudo apt install gnupg2 pass
+2) sudo nano /etc/docker/daemon.json
+3) { "features": { "buildkit": true } }
+4) ctrl+x y enter
+5) sudo service docker restart
+
 ```
 
-# Запустить цеппелин
+# Запустить airflow:
 ```
-sudo docker-compose build download
-sudo docker-compose up -d zeppelin
+cd airflow
+sudo bash ./start.sh
+
 ```
 
-# Зайти внутрь контейнера
-убрать CMD EXEC из Dockerfile
-сбилдить образ: sudo docker build -t task_2 .    
-запустить: sudo docker run -d task_2 sleep 300 
-узнать container_id: sudo docker ps -a    
-зайти sudo docker exec  -it 030952ced479 bash
 
-# spark_course
+# Запустить проект:
+```
+sudo bash ./start.sh
+
+Данные генеряться не моментально, примерно через 10-20 секунд появяться age.csv и age_sql.csv
+
+```
+# Остановить проект:
+```
+sudo bash ./stop.sh
+
+```
+

@@ -8,7 +8,6 @@ services:
       - ./data:/data
     command: [ "http://37.139.43.86/bank.csv" ]
 
-
   spark_task_1:
     build: spark_task_1
     environment:
@@ -34,7 +33,7 @@ services:
       - POSTGRESQL_PASSWORD=password123
       - POSTGRESQL_DATABASE=postgre
     healthcheck:
-      test: pg_isready -U p_user -d postgre
+      test: pg_isready -U p_user -d postgres
       interval: 10s
       retries: 5
       timeout: 5s
@@ -51,7 +50,6 @@ services:
       - ./spark_task_2:/app/spark_task_2
     links:
       - postgresql:postgresql
-
     depends_on:
       download_bank:
         condition: service_completed_successfully
@@ -69,6 +67,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./spark_task_homework:/app/spark_task_homework
+      - ./logs:/spark_task_homework_spark/logs
     command: [ "spark_task_homework/src/task.py" ]
     links:
       - postgresql:postgresql
@@ -85,13 +84,13 @@ services:
     volumes:
       - ./data:/app/data
       - ./spark_task_homework:/app/spark_task_homework
+      - ./logs:/spark_task_homework_sql/logs
     command: [ "spark_task_homework/src/task_sql.py" ]
     links:
       - postgresql:postgresql
     depends_on:
       spark_task_2:
         condition: service_completed_successfully
-
 
   zeppelin:
     build: zeppelin

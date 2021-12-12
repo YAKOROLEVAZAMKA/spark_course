@@ -1,8 +1,13 @@
 from pyspark.sql import SparkSession
 from src.conf import TARGET_TABLE, SAVED_TABLE
+from loguru import logger
+from src.log_df import log_df
 
 import pyspark.sql.functions as f
+import textwrap as tw
 
+# set log file
+logger.add('/spark_task_homework_spark/logs/log.log')
 
 # spark settings
 spark = SparkSession.builder\
@@ -11,7 +16,7 @@ spark = SparkSession.builder\
     .getOrCreate()
 
 # connection url
-url = "jdbc:postgresql://postgresql:5432/postgres"
+url = "jdbc:postgresql://postgresql:5432/postgre"
 
 # load query
 df = spark.read\
@@ -30,10 +35,14 @@ df_grouped = df\
 .agg(
     f.count("*").alias("rows_amount")
     )
+                             
 
-# df_grouped explain
-print("DF_GROUPED_EXPLAIN!!!")
-df_grouped.explain()
+log_data = log_df(df, "SPARK", "explain")
+logger.info(log_data)
+
+log_data = log_df(df, "SPARK", "schema")
+logger.info(log_data)
+
 
 # save to csv
 df_grouped.repartition(1).write.mode("overwrite").format("com.databricks.spark.csv").save(SAVED_TABLE)
